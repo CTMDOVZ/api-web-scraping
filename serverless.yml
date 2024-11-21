@@ -1,0 +1,37 @@
+org: juangomez23
+service: api-web-scraping-modificado
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024 
+  timeout: 30      
+  iam:
+    role: arn:aws:iam::418974378390:role/LabRole
+
+functions:
+  scrape_table_handler:
+    handler: scrape_table_handler.procesar_evento 
+    package:
+      include:
+        - ./** 
+    events:
+      - http:
+          path: /scrape_modificado/table
+          method: get
+          cors: true
+          integration: lambda
+
+resources:
+  Resources:
+    TablaWebScrapingModificada:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: TablaWebScrapingModificada
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
